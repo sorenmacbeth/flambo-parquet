@@ -5,9 +5,9 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :repositories {"cloudera" "https://repository.cloudera.com/artifactory/cloudera-repos/"
                  "snapshots" {:url "s3p://maven.yieldbot.com/snapshots/"
-                                       :username :env :passphrase :env}
+                              :username :env :passphrase :env}
                  "releases" {:url "s3p://maven.yieldbot.com/releases/"
-                                      :username :env :passphrase :env}}
+                             :username :env :passphrase :env}}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [yieldbot/flambo "0.5.0-SNAPSHOT"]
                  [com.twitter/parquet-thrift "1.6.0rc3"]
