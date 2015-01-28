@@ -1,4 +1,4 @@
-(defproject yieldbot/flambo-parquet "0.1.1-SNAPSHOT"
+(defproject yieldbot/flambo-parquet "0.1.1"
   :description "Functions for reading and writing parquet file with flambo."
   :url "https://github.com/yieldbot/flambo-parquet"
   :license {:name "Eclipse Public License"
