@@ -56,7 +56,8 @@
   (let [job (thrift-class! job klass)
         job (if compression-codec
               (compression! job (get COMPRESSION-CODEC compression-codec :uncompressed))
-              job)]
+              job)
+        conf (.getConfiguration job)]
     (.saveAsNewAPIHadoopFile rdd
                              path
                              Void
