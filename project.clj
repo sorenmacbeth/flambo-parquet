@@ -4,9 +4,9 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :repositories {"cloudera" "https://repository.cloudera.com/artifactory/cloudera-repos/"
-                 "yieldbot-snapshots" {:url "s3p://maven.yieldbot.com/snapshots/"
+                 "snapshots" {:url "s3p://maven.yieldbot.com/snapshots/"
                                        :username :env :passphrase :env}
-                 "yieldbot-releases" {:url "s3p://maven.yieldbot.com/releases/"
+                 "releases" {:url "s3p://maven.yieldbot.com/releases/"
                                       :username :env :passphrase :env}}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [yieldbot/flambo "0.5.0-SNAPSHOT"]
