@@ -20,6 +20,10 @@
   (doto job
     (ParquetThriftInputFormat/setUnboundRecordFilter (Class/forName filter-sym))))
 
+(defn column-filter! [conf filter]
+  (doto conf
+    (.set ThriftReadSupport/THRIFT_COLUMN_FILTER_KEY filter)))
+
 (defn parquet-thrift-file
   "Create an RDD from a directory of parquet-thrift files
   where `klass` is the thrift class used to create the parquet files."
@@ -46,10 +50,6 @@
 (defn compression! [job codec-name]
   (doto job
     (ParquetThriftOutputFormat/setCompression codec-name)))
-
-(defn column-filter! [conf filter]
-  (doto conf
-    (.set ThriftReadSupport/THRIFT_COLUMN_FILTER_KEY filter)))
 
 (defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec]
                                                      :or {job (Job.)}}]
