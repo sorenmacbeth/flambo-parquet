@@ -1,13 +1,13 @@
-(defproject yieldbot/flambo-parquet "0.1.0"
+(defproject yieldbot/flambo-parquet "0.1.1"
   :description "Functions for reading and writing parquet file with flambo."
   :url "https://github.com/yieldbot/flambo-parquet"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :repositories {"cloudera" "https://repository.cloudera.com/artifactory/cloudera-repos/"
-                 "yieldbot-snapshots" {:url "s3p://maven.yieldbot.com/snapshots/"
-                                       :username :env :passphrase :env}
-                 "yieldbot-releases" {:url "s3p://maven.yieldbot.com/releases/"
-                                      :username :env :passphrase :env}}
+                 "snapshots" {:url "s3p://maven.yieldbot.com/snapshots/"
+                              :username :env :passphrase :env}
+                 "releases" {:url "s3p://maven.yieldbot.com/releases/"
+                             :username :env :passphrase :env}}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [yieldbot/flambo "0.5.0-SNAPSHOT"]
                  [com.twitter/parquet-thrift "1.6.0rc3"]
