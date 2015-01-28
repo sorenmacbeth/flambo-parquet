@@ -8,12 +8,35 @@
            [org.apache.hadoop.mapreduce Job]
            [org.apache.hadoop.io NullWritable]))
 
+(def COMPRESSION-CODEC {:uncompressed CompressionCodeName/UNCOMPRESSED
+                        :gzip CompressionCodecName/GZIP
+                        :snappy CompressionCodecName/SNAPPY
+                        :lzo CompressionCodeName/LZO
+                        })
+
 ;; # InputFormat configuration
-(defn unbound-record-filter! [job filter-klass]
+;;
+(defn unbound-record-filter! [job filter-sym]
   (doto job
-    (ParquetThriftInputFormat/setUnboundRecordFilter (Class/forName filter-klass))))
+    (ParquetThriftInputFormat/setUnboundRecordFilter (Class/forName filter-sym))))
+
+(defn parquet-thrift-file
+  "Create an RDD from a directory of parquet-thrift files
+  where `klass` is the thrift class used to create the parquet files."
+  [spark-context path klass & {:keys [job record-filter-class]
+                               :or {job (Job.)}}]
+  (let [job (when record-filter
+              (unbound-record-filter! job record-filter-class))
+        conf (.getConfiguration job)]
+    (.newAPIHadoopFile spark-context
+                       path
+                       ParquetThriftInputFormat
+                       NullWritable
+                       klass
+                       conf)))
 
 ;; # OutputFormat configuration
+;;
 (defn thrift-class! [job klass]
   (doto job
     (ParquetThriftOutputFormat/setThriftClass klass)))
@@ -26,26 +49,15 @@
   (doto conf
     (.set ThriftReadSupport/THRIFT_COLUMN_FILTER_KEY filter)))
 
-(defn parquet-thrift-file
-  "Create an RDD from a directory of parquet-thrift files
-  where `klass` is the thrift class used to create the parquet files.
-
-  Accepts an optional :conf keyword argument for a hadoop configuration object."
-  [spark-context path klass & {:keys [job filter-klass]
-                               :or {job (Job.)}}]
-  (let [job (when filter-klass
-              (set-unbound-record-filter job filter-klass))
-        conf (.getConfiguration job)]
-    (.newAPIHadoopFile spark-context
-                       path
-                       ParquetThriftInputFormat
-                       NullWritable
-                       klass
-                       conf)))
-
-(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job]
+(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec filter]
                                                      :or {job (Job.)}}]
-  (let [conf (.getConfiguration job)]
+  (let [job (thrift-class! job klass)
+        job (if compression-codec
+              (compression! job (get COMPRESSION-CODEC compression-codec :uncompressed))
+              job)
+        conf (if filter
+               (-> (.getConfiguration job) (column-filter! filter))
+               (.getConfiguration job))]
     (.saveAsNewAPIHadoopFile rdd
                              path
                              Void
