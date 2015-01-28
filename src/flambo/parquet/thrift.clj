@@ -8,10 +8,10 @@
            [org.apache.hadoop.mapreduce Job]
            [org.apache.hadoop.io NullWritable]))
 
-(def COMPRESSION-CODEC {:uncompressed CompressionCodeName/UNCOMPRESSED
+(def COMPRESSION-CODEC {:uncompressed CompressionCodecName/UNCOMPRESSED
                         :gzip CompressionCodecName/GZIP
                         :snappy CompressionCodecName/SNAPPY
-                        :lzo CompressionCodeName/LZO
+                        :lzo CompressionCodecName/LZO
                         })
 
 ;; # InputFormat configuration
@@ -23,11 +23,13 @@
 (defn parquet-thrift-file
   "Create an RDD from a directory of parquet-thrift files
   where `klass` is the thrift class used to create the parquet files."
-  [spark-context path klass & {:keys [job record-filter-class]
+  [spark-context path klass & {:keys [job unbound-record-filter filter]
                                :or {job (Job.)}}]
-  (let [job (when record-filter
-              (unbound-record-filter! job record-filter-class))
-        conf (.getConfiguration job)]
+  (let [job (when unbound-record-filter
+              (unbound-record-filter! job unbound-record-filter))
+        conf (if filter
+               (-> (.getConfiguration job) (column-filter! filter))
+               (.getConfiguration job))]
     (.newAPIHadoopFile spark-context
                        path
                        ParquetThriftInputFormat
@@ -49,15 +51,12 @@
   (doto conf
     (.set ThriftReadSupport/THRIFT_COLUMN_FILTER_KEY filter)))
 
-(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec filter]
+(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec]
                                                      :or {job (Job.)}}]
   (let [job (thrift-class! job klass)
         job (if compression-codec
               (compression! job (get COMPRESSION-CODEC compression-codec :uncompressed))
-              job)
-        conf (if filter
-               (-> (.getConfiguration job) (column-filter! filter))
-               (.getConfiguration job))]
+              job)]
     (.saveAsNewAPIHadoopFile rdd
                              path
                              Void
