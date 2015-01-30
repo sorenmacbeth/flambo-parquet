@@ -29,8 +29,9 @@
   where `klass` is the thrift class used to create the parquet files."
   [spark-context path klass & {:keys [job unbound-record-filter filter]
                                :or {job (Job.)}}]
-  (let [job (when unbound-record-filter
-              (unbound-record-filter! job unbound-record-filter))
+  (let [job (if unbound-record-filter
+              (unbound-record-filter! job unbound-record-filter)
+              job)
         conf (if filter
                (-> (.getConfiguration job) (column-filter! filter))
                (.getConfiguration job))]
@@ -55,7 +56,7 @@
                                                      :or {job (Job.)}}]
   (let [job (thrift-class! job klass)
         job (if compression-codec
-              (compression! job (get COMPRESSION-CODEC compression-codec :uncompressed))
+              (compression! job (get COMPRESSION-CODEC compression-codec :snappy))
               job)
         conf (.getConfiguration job)]
     (.saveAsNewAPIHadoopFile rdd
