@@ -1,4 +1,5 @@
 (ns flambo.parquet.thrift
+  (:require [clojure.tools.logging :as log])
   (:import [parquet.hadoop ParquetOutputFormat]
            [parquet.hadoop.thrift
             ParquetThriftOutputFormat
@@ -71,12 +72,14 @@
         job (summary-metadata! job summary-metadata?)
         conf (.getConfiguration job)]
     (if direct?
-      (.saveAsNewAPIHadoopFile rdd
-                               path
-                               Void
-                               klass
-                               ParquetThriftDirectOutputFormat
-                               conf)
+      (do
+        (log/info "using direct output committer!")
+        (.saveAsNewAPIHadoopFile rdd
+                                 path
+                                 Void
+                                 klass
+                                 ParquetThriftDirectOutputFormat
+                                 conf))
       (.saveAsNewAPIHadoopFile rdd
                                path
                                Void
