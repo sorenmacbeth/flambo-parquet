@@ -26,7 +26,10 @@
 
 (defn parquet-thrift-file
   "Create an RDD from a directory of parquet-thrift files
-  where `klass` is the thrift class used to create the parquet files."
+  where `klass` is the thrift class used to create the parquet files.
+
+  See https://github.com/Parquet/parquet-mr/blob/master/parquet_cascading.md
+  for the filter syntax."
   [spark-context path klass & {:keys [job unbound-record-filter filter]
                                :or {job (Job.)}}]
   (let [job (if unbound-record-filter
