@@ -6,7 +6,8 @@
             ThriftReadSupport]
            [parquet.hadoop.metadata CompressionCodecName]
            [org.apache.hadoop.mapreduce Job]
-           [org.apache.hadoop.io NullWritable]))
+           [org.apache.hadoop.io NullWritable]
+           [flambo.parquet.hadoop.thrift ParquetThriftDirectOutputFormat]))
 
 (def COMPRESSION-CODEC {:uncompressed CompressionCodecName/UNCOMPRESSED
                         :gzip CompressionCodecName/GZIP
@@ -55,19 +56,33 @@
   (doto job
     (ParquetThriftOutputFormat/setCompression codec-name)))
 
-(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec]
-                                                     :or {job (Job.)}}]
+(defn summary-metadata! [job enabled?]
+  (doto job
+    (-> .getConfiguration (.setBoolean ParquetThriftOutputFormat/ENABLE_JOB_SUMMARY enabled?))))
+
+(defn save-as-parquet-thrift-file [rdd path klass & {:keys [job compression-codec summary-metadata? direct?]
+                                                     :or {job (Job.)
+                                                          summary-metadata? true
+                                                          direct? false}}]
   (let [job (thrift-class! job klass)
         job (if compression-codec
               (compression! job (get COMPRESSION-CODEC compression-codec :snappy))
               job)
+        job (summary-metadata! job summary-metadata?)
         conf (.getConfiguration job)]
-    (.saveAsNewAPIHadoopFile rdd
-                             path
-                             Void
-                             klass
-                             ParquetThriftOutputFormat
-                             conf)))
+    (if direct?
+      (.saveAsNewAPIHadoopFile rdd
+                               path
+                               Void
+                               klass
+                               ParquetThriftDirectOutputFormat
+                               conf)
+      (.saveAsNewAPIHadoopFile rdd
+                               path
+                               Void
+                               klass
+                               ParquetThriftOutputFormat
+                               conf))))
 
 (comment
   (require '[flambo.tuple :as ft])

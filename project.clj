@@ -21,6 +21,8 @@
              :provided
              {:dependencies [[org.apache.spark/spark-core_2.10 "1.2.0"]
                              [org.apache.hadoop/hadoop-client "2.5.0-mr1-cdh5.3.0"]]}}
+  :source-paths ["src/clj"]
+  :java-source-paths ["src/java"]
   :plugins [[s3-wagon-private "1.1.2"]]
   :javac-options ["-source" "1.6" "-target" "1.6"]
   :jvm-opts ^replace ["-server" "-Xmx4g" "-Xms4g"])
