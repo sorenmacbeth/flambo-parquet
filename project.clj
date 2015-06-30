@@ -10,7 +10,7 @@
                              :username :env :passphrase :env}}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [yieldbot/flambo "0.6.0-SNAPSHOT"]
+                 [yieldbot/flambo "0.7.0-SNAPSHOT"]
                  [com.twitter/parquet-thrift "1.6.0rc3"]
                  [com.twitter.elephantbird/elephant-bird-core "4.5"
                   :exclusions [com.google.guava/guava]]
